@@ -45,7 +45,7 @@ app.get('/userlist',function(req,res){      //when get userlist is asked this me
         console.log(" all peers sent by c server : "); 
         all_peers.forEach(element => {
             if(element.name!= username)
-            console.log(element.name + "  and his port is : " + element.ip);
+            console.log(element.name + "  and his ip is : " + element.ip + " and his port is : "+ element.port);
         });  
 
         client.emit("disconnect");

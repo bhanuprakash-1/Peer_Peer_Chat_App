@@ -13,7 +13,8 @@ var all_peers = []
 io.on('connection', function(socket) {
 
    var address = socket.handshake.address ; 
-   let ipv4 = new IPv4(address);        //extract ip address of peer
+   var ipv4 =  new IPv4(address);        //extract ip address of peer
+   ipv4 = ipv4.toString();
    console.log('A peer connected :  '+ ipv4);   
    var peer = {} 
    //peer.id = socket.id;
