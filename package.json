@@ -1,0 +1,25 @@
+{
+  "name": "fully-connected-topology",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.0.1",
+    "express": "^4.17.1",
+    "fully-connected-topology": "^1.1.1",
+    "http": "^0.0.0",
+    "ip-num": "^1.2.2",
+    "ipaddr.js": "^1.9.1",
+    "readline-sync": "^1.4.10",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
