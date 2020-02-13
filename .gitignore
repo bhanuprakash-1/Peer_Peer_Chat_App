@@ -1,5 +1,4 @@
 node_modules/
 index.html
-app.js
 app2.js
 views/list.ejs
