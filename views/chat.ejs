@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>                                                                                                   
+   <head>
+      <title> Chatting page </title>
+   </head>
+
+ <!-- peer_name , all_chats[peer_name] , my_name  -->
+
+
+<body>
+
+    <form action="/" method="GET">
+        <input type="submit" value="Go to home "><br> 
+     </form>
+
+    <% if(peer_name=""){ %>
+        <h3> No such peer , go to home page </h3>
+
+    <% }else{%>
+
+        <h3> All chats : </h3> <br>
+
+        <% all_chats.forEach(element => {
+          
+          <strong> <%=element.sender> : </strong>  <%= element.chat %>
+          
+        <%});%>
+
+    <% } %> 
+    
+    <form action="/sendmessage"
+
+</body>
+    
+</html>       

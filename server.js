@@ -1,25 +1,18 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-const ipaddr = require('ipaddr.js');
+//const ipaddr = require('ipaddr.js');    used to convert ipv6 to ipv4
 const IPv4 = require("ip-num").IPv4;
 
 var all_peers = []  
 
-// app.get('/', function(req, res) {
-//    res.sendfile('index.html');       
-// });
-
 io.on('connection', function(socket) {
 
    var address = socket.handshake.address ; 
-   var ipv4 =  new IPv4(address);        //extract ip address of peer
+   var ipv4 =  new IPv4(address);           //extract ip address of peer
    ipv4 = ipv4.toString();
    console.log('A peer connected :  '+ ipv4);   
    var peer = {} 
-   //peer.id = socket.id;
-   
-  // ipv4.toBinaryString();
    peer.ip = ipv4;
    
    
@@ -27,7 +20,8 @@ io.on('connection', function(socket) {
       
    socket.on("my_name",function(data){
 
-      socket.emit('peers_list',all_peers);
+      
+      socket.emit('peer_list',all_peers);
       peer.name = data.username;
       peer.port = data.port;
       console.log("received peer name : "  + peer.name + "  " + peer.port);
@@ -36,13 +30,24 @@ io.on('connection', function(socket) {
 
       for(var i=0 ; i<all_peers.length ; i++)
       {
-         if(all_peers[i].name == peer.name)
-         flag = false;
+         if(all_peers[i].name == peer.name){
+            flag = false;
+         }
+         
       }
      
       if(flag){
-          all_peers.push(peer);
+
+          all_peers.push(peer); 
       }
+
+      console.log("All peers till now:");
+
+      all_peers.forEach(element => {
+         console.log(element.name);
+
+      });
+
         //sending client the list of all peers 
 
       // socket.emit("list_of_users",all_sockets)
@@ -82,7 +87,7 @@ io.on('connection', function(socket) {
    socket.on('disconnect', function () {
 
       console.log(" a peer disconn : " + peer.name); 
-      //all_sockets.delete(socket.id)
+      //all_sockets.delete(socket.id)  
 
    });
 });

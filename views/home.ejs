@@ -6,15 +6,16 @@
 
 <body>
     
+
     <h1> This is home page for chat app</h1>
 
-    <h1> Hi <%=username %> , you are on port : <%=port%>  </h1>
+    <h1> Hi <%=username %> , you are on port : <%=port%>  </h1> 
 
-    <ul></ul>
+    <ul>
     <% all_peers.forEach(element => {  %>
         
         <% if(element.name!=username){ %>
-                <li> <%=element.name %>     <%= element.ip  %>      <%=element.port %>    </li>
+             <li> <%=element.name %>     <%= element.ip  %>      <%=element.port %>    </li>  </a>
 
         <%} %> 
 
@@ -25,18 +26,19 @@
 
     <form action="/userlist" method="GET">
        <input type="submit" value="fetch peers list "><br> 
-    </form>
+    </form> 
 
 
     <h3> Want to connect to a friend? Enter his name from above list : (if no list , click on fetch ) </h3>
          
     <form id = "id1" , action="/connect_to" method="POST"   >
-        <input type="text" name = "port_no" ><br> 
+        <input type="text" name = "name" ><br> 
         <input type="submit" value="submit">  
     </form>  
 
-  
-
+   
+    
+ 
     
       
     
