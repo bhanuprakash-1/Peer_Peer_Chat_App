@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+   <head>
+         <title>Hello world</title>
+        
+        <!-- <script src="jquery-3.4.1.min.js"></script> -->
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+         <script src = "/socket.io/socket.io.js"></script> 
+         
+   </head>
+   
+   
+<body>
+   
+   <h1 id = "username"></h1>
+   <!-- <script>
+      var socket = io('http://localhost:3000'); 
+      socket.on('testerEvent', function(data){document.write(data.description)});
+      
+   </script> -->
+
+   
+   <input type="button" , value="get peers list ", onclick="get_peers()">
+
+   <h3> List of peers : </h3>
+   
+   <ul id = "list_of_peers">
+          <!-- list of peers here -->
+   </ul>
+
+   <!-- <form  id="peer_form"  > -->
+      <h2>Enter the name of person to connect : </h2> 
+      <label>Peer Name :</label>
+      <input type="text" name="name" id="peer_name" placeholder="peer name" /> 
+      
+      <input type="button" value="Connect"  onclick="connect_to_peer()" /> 
+   <!-- </form> -->
+
+   
+ <h3> Chats go here : </h3>  <p id="curr_peer"></p> 
+
+<ul id="chats">
+
+
+
+</ul>
+
+<!-- <form id="type_space" > -->
+   <input type="text" name="name" id="send_msg" placeholder="type here " />
+   <input type = "button" value="send" onclick="send_msg()" /> 
+<!-- </form> -->
+ 
+<!-- 
+<form action="#" id="chat_box" >
+ <label> Type here :</label>
+ <input type="text" name = 
+
+
+</form> -->
+
+
+ 
+<input type="button" , value="discon from p2p ", onclick="discon()"> 
+
+</body>
+
+<script>
+
+
+var locale ;
+var username;
+var port;
+var all_chats = {};
+var curr_peer='' ;
+$(document).ready(function(){
+
+   
+    ask_port();
+
+});
+
+
+
+function send_msg(){
+
+   event.preventDefault();
+   if(curr_peer==''){
+         alert(" Select a peer before sending !! ");            
+   }
+   else{
+
+      var msg = document.getElementById("send_msg").value;
+      $('#chats').append('<li><strong>'+username+ ' : </strong>' + msg + ' </li>' );
+      var message = {};
+      message.chat = msg;
+      message.sender = username;
+      message.receiver = curr_peer;
+      locale.emit("send_msg",   message );
+
+      if(all_chats[message.receiver]!=undefined){
+         all_chats[message.receiver].push(message);
+      }
+      else{
+         all_chats[message.receiver]= new Array(message);
+      }
+
+   }
+  
+   document.getElementById("send_msg").value="";
+}
+
+
+
+   
+
+
+
+function ask_port(){
+
+   username = prompt("Enter the  name : "," your name");   
+   port = parseInt(prompt("Enter the  port number : ",8080));
+   document.getElementById("username").innerHTML = ' HI '+ username;
+  if(port<1000 || port > 64000)
+  {
+      alert("port not in range !!");
+      location.reload();
+  }
+  else{
+      locale = io('http://localhost:'+port );
+      locale.on("connect",function(){
+
+         init = {};
+         init.data = "web";
+         init.name = username;
+         locale.emit("init",init);
+
+         alert("Conected to local host !!!"); 
+
+
+            locale.on("connected_to",function(peer){ 
+
+            alert("connected to : "+ peer.peer.name);
+           // console.log(" on connected_to !!");
+            all_chats = peer.all_chats ;
+            curr_peer = peer.peer.name;  
+             
+            $('#chats').html(''); 
+            document.getElementById("curr_peer").innerHTML = curr_peer;
+            
+
+            if(all_chats[curr_peer]!=undefined){
+               all_chats[curr_peer].forEach(element => { 
+                  
+                  
+                  $('#chats').append('<li><strong>'+element.sender+ ' : </strong>' + element.chat + ' </li>' );  
+                  
+
+                  }); 
+
+            }
+            
+
+            });
+
+
+            locale.on("peer_list",function(list_peers){  
+
+               peer_list = '';
+
+               list_peers.forEach(element => {
+
+                  if(element.name != username)
+                  peer_list+= '<li> '+ element.name + '    ' + element.ip + '    ' + element.port +'</li>';
+               });
+               document.getElementById("list_of_peers").innerHTML = peer_list ;
+
+               });
+
+
+
+
+
+            locale.on("got_a_connection",function(peer){
+
+            audio_on_msg();
+            curr_peer = peer.name;
+            //document.getElementById("curr_peer").innerHTML = peer.name;
+             alert("got connection from "+peer.name);
+
+
+            });
+
+
+
+            locale.on("got_msg",function(message){
+
+   
+
+               if(curr_peer==message.sender){      
+
+                  
+                  alert("got msg from curr");
+                   
+                  if(all_chats[message.sender]!=undefined){
+                     all_chats[message.sender].push(message);
+                  }
+                  else{
+                     all_chats[message.sender] = new Array(message);
+
+                  }
+
+                  // $('#chats').innerHTML = '';
+                  // if(all_chats[curr_peer]!=undefined){
+                  //    all_chats[curr_peer].forEach(element => { 
+                  
+                  
+                  $('#chats').append('<li><strong>'+message.sender+ ' : </strong>' + message.chat + ' </li>' );  
+                  
+
+                  // }); 
+
+            //}
+
+                  
+
+               }
+               else{
+
+                  alert("got a message from non curr : "+message.sender); 
+
+                  if(all_chats[message.sender]!=undefined){
+                     all_chats[message.sender].push(message);
+                  }
+                  else{
+                     all_chats[message.sender] = new Array(message);
+
+                  }
+
+                     
+
+               }
+
+
+            });
+
+
+            locale.on("no_peer_found",function(){ 
+
+               alert(" No peer with that name, refresh peer list , enter again !!");
+
+            });
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      });
+      
+  }
+
+}
+
+
+function discon(){
+
+    locale.emit("discon");
+    alert("disconnected from p2p network !! ");
+
+
+}
+
+function connect_to_peer(){
+    
+    event.preventDefault(); 
+    var name = document.getElementById("peer_name").value;
+    alert("peer_name is:: "+name);
+    
+   document.getElementById("peer_name").value="";
+
+
+   locale.emit("connect_to_peer",name);
+
+}
+
+
+
+
+
+// locale.on("connected_to",function(peer){ 
+
+//     alert("connected to : "+ peer.peer.name);
+//     console.log(" on connected_to !!");
+//      all_chats = peer.all_chats ;
+
+//      $('#chats').html(''); 
+//      document.getElementById("curr_peer").innerHTML = "Test name!!";
+//      curr_peer = peer.peer.name;
+
+//      if(all_chats[peer.name]!=undefined){
+//          all_chats[peer.name].forEach(element => { 
+            
+            
+//             $('#chats').append('<li><strong>'+element.sender+ ' : </strong>' + element.chat + ' </li>' );  
+            
+
+//             }); 
+    
+//      }
+     
+
+// });
+
+// locale.on("got_a_connection",function(peer){
+
+//    audio_on_msg();
+//    curr_peer = peer.name;
+//    document.getElementById("curr_peer").innerHTML = peer.name;
+//    alert("got connection from "+peer.name);
+
+
+// });
+
+// locale.on("got_msg",function(message){
+
+   
+
+//    if(curr_peer==message.sender){
+
+//       if(all_chats[message.sender]!=undefined){
+//          all_chats[message.sender].push(message);
+//       }
+//       else{
+//          all_chats[message.sender] = new Array(message);
+
+//       }
+
+//       $('chats').append('<li><strong>'+message.sender+ ' : </strong>' + message.chat + ' </li>')
+
+//    }
+//    else{
+
+
+         
+
+//    }
+
+
+// });
+
+// locale.on("no_peer_found",function(){ 
+
+// alert(" No peer with that name, refresh peer list , enter again !!");
+
+// });   
+
+
+function get_peers(){
+
+    alert("connected to p2p netwrok !! ");
+    locale.emit("get_peers");
+    locale.on("peer_list",function(list_peers){  
+
+        peer_list = '';
+
+        list_peers.forEach(element => {
+
+            if(element.name != username)
+            peer_list+= '<li> '+ element.name + '    ' + element.ip + '    ' + element.port +'</li>';
+        });
+        document.getElementById("list_of_peers").innerHTML = peer_list ;
+
+    });
+    
+
+
+}
+
+
+function audio_on_msg() {
+  (new Audio('https://notificationsounds.com/soundfiles/8b16ebc056e613024c057be590b542eb/file-sounds-1113-unconvinced.mp3')).play();
+}
+
+
+
+
+</script>
+
+
+
+
+   
+</html>
