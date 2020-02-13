@@ -78,7 +78,7 @@ io.on('connection',function( client ){
         
                     if(element.name = client_name){
                         peer = element;
-                        local_flag = true;
+                       // local_flag = true;
                     }
                 });
                
